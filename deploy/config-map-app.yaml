@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: frontend-config
+data:
+  BASE_API_SERVICE1: http://service1-svc:8090
+  BASE_API_SERVICE2: http://service2-svc:8091

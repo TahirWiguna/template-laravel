@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: frontend
+        tier: backend
+    spec:
+      enableServiceLinks: false
+      containers:
+        - name: frontend
+          image: registry.gitlab.com/bpd-diy/test-frontend:0.0.2
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: code
+              mountPath: /code
+          env:
+          - name: BASE_API_SERVICE1 
+            valueFrom:
+              configMapKeyRef:
+                name: frontend-config          
+                key: BASE_API_SERVICE1 
+          - name: BASE_API_SERVICE2
+            valueFrom:
+              configMapKeyRef:
+                name: frontend-config
+                key: BASE_API_SERVICE2
+          lifecycle:
+            postStart:
+              exec:
+                command: [ "/bin/sh", "-c", "cp -r /var/www/html/. /code" ]
+      imagePullSecrets:
+        - name: gitlab-auth
+      volumes:
+        - name: code
+          persistentVolumeClaim:
+            claimName: code
